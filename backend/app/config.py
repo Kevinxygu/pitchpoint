@@ -12,7 +12,7 @@ class Config:
     
     # Server
     HOST = os.getenv('HOST', '0.0.0.0')
-    PORT = int(os.getenv('PORT', 5000))
+    PORT = int(os.getenv('PORT', 8080))
     
     # API Keys
     # CLAUDE_API_KEY = os.getenv('CLAUDE_API_KEY')
