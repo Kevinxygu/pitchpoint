@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # BACKEND SERVICE (Python Flask)
+  # ============================================================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    
+    container_name: pitchlab-backend
+    
+    ports:
+      - "5000:5000"
+    
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_DEBUG=1
+      - FLASK_ENV=development
+      - PORT=5000
+      - HOST=0.0.0.0
+      # Add your API keys here or use .env file
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+    
+    # Mount code for hot reload
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__  # Don't mount pycache
+    
+    restart: unless-stopped
+    
+    networks:
+      - pitchlab-network
+
+  # ============================================================================
+  # FRONTEND SERVICE (Next.js)
+  # ============================================================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    
+    container_name: pitchlab-frontend
+    
+    ports:
+      - "3000:3000"
+    
+    environment:
+      # Point to backend service
+      - NEXT_PUBLIC_API_URL=http://localhost:5000/api
+    
+    # Mount code for hot reload
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    
+    depends_on:
+      - backend
+    
+    restart: unless-stopped
+    
+    networks:
+      - pitchlab-network
+
+# ============================================================================
+# NETWORKS
+# ============================================================================
+networks:
+  pitchlab-network:
+    driver: bridge
