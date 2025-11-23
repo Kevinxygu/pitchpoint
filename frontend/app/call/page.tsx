@@ -25,6 +25,7 @@ export default function CallPage() {
     // Refs
     const socketRef = useRef<Socket | null>(null)
     const recognitionRef = useRef<any>(null)
+    const spacePressedRef = useRef<boolean>(false)
     const videoRef = useRef<HTMLVideoElement>(null)
     const streamRef = useRef<MediaStream | null>(null)
     const audioContextRef = useRef<AudioContext | null>(null)
@@ -286,6 +287,33 @@ export default function CallPage() {
 
     const handlePushToTalkStart = () => startListening()
     const handlePushToTalkEnd = () => stopListening()
+
+    // Keyboard push-to-talk (Space bar)
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.code === 'Space' && !spacePressedRef.current && isConnected) {
+                event.preventDefault()
+                spacePressedRef.current = true
+                handlePushToTalkStart()
+            }
+        }
+
+        const handleKeyUp = (event: KeyboardEvent) => {
+            if (event.code === 'Space' && spacePressedRef.current) {
+                event.preventDefault()
+                spacePressedRef.current = false
+                handlePushToTalkEnd()
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        window.addEventListener('keyup', handleKeyUp)
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown)
+            window.removeEventListener('keyup', handleKeyUp)
+        }
+    }, [isConnected])
 
     // End call
     const handleEndCall = () => {
