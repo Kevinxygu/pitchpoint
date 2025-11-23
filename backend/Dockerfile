@@ -21,5 +21,9 @@ COPY . .
 # Expose port
 EXPOSE 8080
 
-# Run Flask with auto-reload
-CMD ["flask", "run", "--host=0.0.0.0", "--port=8080", "--reload"]
+# Set environment variables for Flask
+ENV FLASK_APP=run.py
+ENV PYTHONUNBUFFERED=1
+
+# Run the application with python directly (better for socketio)
+CMD ["python", "run.py"]
