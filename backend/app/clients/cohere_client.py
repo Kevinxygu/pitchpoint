@@ -76,7 +76,7 @@ class CohereClient:
         print(f"📨 Sending {len(messages)} messages to Cohere v2")
         
         response = self.client.chat(
-            model="command-r-plus",
+            model="command-a-03-2025",
             messages=messages,
             temperature=0.7,
             max_tokens=150
