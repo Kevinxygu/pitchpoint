@@ -1,16 +1,18 @@
-from app.main import create_app
-from app.config import config
+import os
+from app import create_app, socketio
 
 app = create_app()
 
 if __name__ == '__main__':
-    print(f"🚀 Server starting on http://{config.HOST}:{config.PORT}")
-    print(f"📊 Health check: http://{config.HOST}:{config.PORT}/health")
-    print(f"🤖 Persona API: http://{config.HOST}:{config.PORT}/api/persona/generate")
+    port = int(os.getenv('PORT', 8080))
+    host = os.getenv('HOST', '0.0.0.0')
     
-    app.run(
-        host=config.HOST,
-        port=config.PORT,
-        debug=config.DEBUG
+    print(f"Starting server on {host}:{port}")
+    
+    socketio.run(
+        app, 
+        host=host, 
+        port=port, 
+        debug=True, 
+        allow_unsafe_werkzeug=True
     )
-

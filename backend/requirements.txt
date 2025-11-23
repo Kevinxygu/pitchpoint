@@ -1,7 +1,9 @@
-Flask==3.0.0
-Flask-CORS==4.0.0
+flask==3.0.0
+flask-cors==4.0.0
+flask-socketio==5.3.5
+python-socketio==5.10.0
+cohere==4.37
+elevenlabs==1.0.0
 python-dotenv==1.0.0
-requests==2.31.0
-pydantic==2.5.0
-anthropic==0.8.0
-gunicorn==21.2.0
+websockets==12.0
+aiohttp==3.9.0

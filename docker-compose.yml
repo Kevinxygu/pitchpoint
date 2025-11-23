@@ -20,14 +20,15 @@ services:
       - FLASK_ENV=development
       - PORT=8080
       - HOST=0.0.0.0
-      # Add your API keys here or use .env file
-      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      # API Keys - load from .env file
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - ELEVENLABS_VOICE_ID=${ELEVENLABS_VOICE_ID:-21m00Tcm4TlvDq8ikWAM}
+      - COHERE_API_KEY=${COHERE_API_KEY}
     
     # Mount code for hot reload
     volumes:
       - ./backend:/app
-      - /app/__pycache__  # Don't mount pycache
+      - /app/__pycache__
     
     restart: unless-stopped
     
@@ -48,8 +49,9 @@ services:
       - "3000:3000"
     
     environment:
-      # Point to backend service
-      - NEXT_PUBLIC_API_URL=http://localhost:5000/api
+      # Point to backend on host machine (accessible from browser)
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8080
     
     # Mount code for hot reload
     volumes:
