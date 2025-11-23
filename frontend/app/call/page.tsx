@@ -302,7 +302,12 @@ export default function CallPage() {
         }
 
         // Save transcript and navigate
-        sessionStorage.setItem('transcript', JSON.stringify(messages))
+        // Format messages into a readable transcript string
+        const formattedTranscript = messages
+            .map(msg => `${msg.speaker === 'user' ? 'You' : persona?.name || 'AI'}: ${msg.text}`)
+            .join('\n\n')
+
+        sessionStorage.setItem('callTranscript', formattedTranscript)
         sessionStorage.setItem('callDuration', callDuration.toString())
         router.push('/feedback')
     }
