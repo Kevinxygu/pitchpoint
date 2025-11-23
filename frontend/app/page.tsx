@@ -94,7 +94,7 @@ export default function Home() {
       <main className="landing-hero">
         <div className="landing-hero-content">
           <h1 className="landing-hero-title">
-            Discover how you can score your dream deal with your perfect pitch
+            Discover how you can score your dream deal with PitchPoint AI Sales Coach
           </h1>
 
           <p className="landing-hero-subtitle">
