@@ -154,7 +154,7 @@ export default function FeedbackPage() {
                 <div className="bg-white rounded-lg shadow-lg p-6">
                     <details>
                         <summary className="text-lg font-semibold text-gray-800 cursor-pointer hover:text-blue-600 transition">
-                            View Full Transcript
+                            Call Transcript:
                         </summary>
                         <div className="mt-4 p-4 bg-gray-50 rounded-lg max-h-96 overflow-y-auto">
                             <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
