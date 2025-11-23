@@ -25,5 +25,9 @@ EXPOSE 8080
 ENV FLASK_APP=run.py
 ENV PYTHONUNBUFFERED=1
 
-# Run the application with python directly (better for socketio)
-CMD ["python", "run.py"]
+# Health check (optional but recommended for production)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')" || exit 1
+
+# Run with gunicorn for production (supports WebSockets via gevent-websocket)
+CMD ["gunicorn", "-k", "geventwebsocket.gunicorn.workers.GeventWebSocketWorker", "-w", "1", "-b", "0.0.0.0:8080", "run:app"]
