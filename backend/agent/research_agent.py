@@ -5,7 +5,7 @@ import textwrap
 from typing import Any, Dict, Optional
 
 from dotenv import load_dotenv
-from google import genai
+import google.generativeai as genai
 
 
 class SportsPartnerResearchAgent:
@@ -16,14 +16,15 @@ class SportsPartnerResearchAgent:
 
     def __init__(
         self,
-        model_name: str = "gemini-2.5-flash",
+        model_name: str = "gemini-flash-latest",
     ) -> None:
         load_dotenv()
         self.api_key = os.getenv("GEMINI_API_KEY")
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY is required to use the research agent.")
 
-        self.client = genai.Client()
+        genai.configure(api_key=self.api_key)
+        self.model_name = model_name
 
     def _profile_schemas(self) -> Dict[str, Dict[str, Any]]:
         """Return the type-specific schemas used to enforce consistent JSON outputs."""
@@ -167,9 +168,9 @@ class SportsPartnerResearchAgent:
             raise ValueError("Subject must be a non-empty string.")
 
         prompt = self._build_prompt(subject.strip())
-        response = self.client.models.generate_content(
-            model="gemini-2.5-flash", contents=prompt
-        )
-        text = getattr(response, "text", None) or ""
+        model = genai.GenerativeModel(self.model_name)
+        response = model.generate_content(prompt)
+        text = response.text if hasattr(response, 'text') else ""
 
         return self._extract_json(text)
+
