@@ -41,6 +41,9 @@ export default function DashboardPage() {
         </p>
         <ProfileCard />
         <div className="cta-row">
+          <button className="button" onClick={() => router.push('/test-call')}>
+            Go to Test Call
+          </button>
           <LogoutButton />
         </div>
       </div>
