@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Auth0ProviderWithConfig from "./auth0-provider";
 
 const interSans = Inter({
   variable: "--font-geist-sans",
@@ -22,7 +23,9 @@ export default function RootLayout({
       <body
         className={`${interSans.variable} antialiased`}
       >
-        {children}
+        <Auth0ProviderWithConfig>
+          {children}
+        </Auth0ProviderWithConfig>
       </body>
     </html>
   );
