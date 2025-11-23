@@ -97,8 +97,10 @@ export default function Home() {
             Score your dream deal with PitchPoint AI Sales Coach
           </h1>
 
-          <p className="landing-hero-subtitle">
-            Your go-to AI mock sales call tool for sports partnership teams
+          <p className="landing-hero-subtitle text-xs">
+            PitchPoint helps sports partnership teams practice selling with AI-powered mock calls trained on your actual deals,
+            so your reps stop leaving money on the table, pitch the right products every time, and
+            close partnerships with confidence.
           </p>
 
           <div className="landing-hero-actions">

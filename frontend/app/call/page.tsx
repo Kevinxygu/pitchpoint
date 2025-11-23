@@ -32,7 +32,14 @@ export default function CallPage() {
 
     // Initialize session
     useEffect(() => {
+        let mounted = true
+
         const initSession = async () => {
+            if (socketRef.current?.connected) {
+                console.log('⚠️ Socket already connected, skipping init')
+                return
+            }
+
             try {
                 setConnectionStatus('Loading persona...')
                 console.log('🚀 Initializing session...')
@@ -40,17 +47,19 @@ export default function CallPage() {
                 // Get persona from URL params or sessionStorage
                 const personaStr = searchParams?.get('persona') || sessionStorage.getItem('persona')
                 if (!personaStr) {
-                    setError('No persona data found')
-                    setConnectionStatus('Error: No persona')
+                    if (mounted) {
+                        setError('No persona data found')
+                        setConnectionStatus('Error: No persona')
+                    }
                     return
                 }
 
                 const parsedPersona = JSON.parse(personaStr)
-                setPersona(parsedPersona)
+                if (mounted) setPersona(parsedPersona)
                 console.log('✅ Persona loaded:', parsedPersona)
 
                 // Create voice session
-                setConnectionStatus('Creating session...')
+                if (mounted) setConnectionStatus('Creating session...')
                 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'
                 console.log('🔗 Connecting to backend:', backendUrl)
 
@@ -65,25 +74,32 @@ export default function CallPage() {
                 }
 
                 const data = await response.json()
-                setSessionId(data.session_id)
-                console.log('✅ Session created:', data.session_id)
+                if (mounted) {
+                    setSessionId(data.session_id)
+                    console.log('✅ Session created:', data.session_id)
 
-                // Connect WebSocket
-                setConnectionStatus('Connecting WebSocket...')
-                connectWebSocket(data.session_id)
+                    // Connect WebSocket
+                    setConnectionStatus('Connecting WebSocket...')
+                    connectWebSocket(data.session_id)
+                }
 
             } catch (error) {
                 console.error('❌ Error initializing session:', error)
-                setError(error instanceof Error ? error.message : 'Failed to initialize')
-                setConnectionStatus('Error')
+                if (mounted) {
+                    setError(error instanceof Error ? error.message : 'Failed to initialize')
+                    setConnectionStatus('Error')
+                }
             }
         }
 
         initSession()
 
         return () => {
+            mounted = false
             if (socketRef.current) {
+                console.log('🧹 Cleaning up socket...')
                 socketRef.current.disconnect()
+                socketRef.current = null
             }
             if (recognitionRef.current) {
                 recognitionRef.current.stop()
@@ -131,15 +147,21 @@ export default function CallPage() {
 
     // Connect WebSocket
     const connectWebSocket = (session_id: string) => {
+        if (socketRef.current?.connected) {
+            console.log('⚠️ Socket already connected, joining session...')
+            socketRef.current.emit('join_voice_session', { session_id })
+            return
+        }
+
         const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'
         console.log('🔌 Attempting WebSocket connection to:', backendUrl)
 
         const socket = io(backendUrl, {
-            transports: ['websocket', 'polling'], // Try both transports
             reconnection: true,
             reconnectionAttempts: 5,
             reconnectionDelay: 1000,
-            timeout: 10000
+            timeout: 20000,
+            autoConnect: true
         })
 
         socket.on('connect', () => {
