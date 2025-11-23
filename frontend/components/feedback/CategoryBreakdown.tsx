@@ -34,8 +34,8 @@ export default function CategoryBreakdown({ categories }: CategoryBreakdownProps
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-8">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+    <div className="bg-palette-background-black border-1 border-[#DE0037] rounded-lg shadow-lg p-8">
+      <h2 className="text-2xl font-bold text-[#FFFFFF] mb-6">
         Category Breakdown
       </h2>
 
@@ -43,22 +43,22 @@ export default function CategoryBreakdown({ categories }: CategoryBreakdownProps
         {categories.map((category, index) => (
           <div
             key={index}
-            className="border-2 border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 transition"
+            className="border-2 border-[#FFFFFF]/20 rounded-lg overflow-hidden hover:border-[#DE0037] transition"
           >
             {/* Category Header (Always Visible) */}
             <button
               onClick={() => setExpandedCategory(expandedCategory === index ? null : index)}
-              className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition"
+              className="w-full p-4 flex items-center justify-between hover:bg-[#FFFFFF]/5 transition"
             >
               <div className="flex items-center gap-4 flex-1">
-                <div className={`px-4 py-2 rounded-lg border-2 font-bold ${getScoreColor(category.score)}`}>
+                <div className={`px-4 py-2 rounded-lg border-2 font-bold bg-palette-background-black`}>
                   {category.score}
                 </div>
                 <div className="text-left flex-1">
-                  <h3 className="font-semibold text-gray-800 text-lg">
+                  <h3 className="font-semibold text-[#FFFFFF] text-lg">
                     {category.name}
                   </h3>
-                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                  <div className="w-full bg-[#FFFFFF]/20 rounded-full h-2 mt-2">
                     <div
                       className={`h-2 rounded-full transition-all duration-500 ${getBarColor(category.score)}`}
                       style={{ width: `${category.score}%` }}
@@ -67,9 +67,8 @@ export default function CategoryBreakdown({ categories }: CategoryBreakdownProps
                 </div>
               </div>
               <svg
-                className={`w-6 h-6 text-gray-400 transition-transform ${
-                  expandedCategory === index ? 'rotate-180' : ''
-                }`}
+                className={`w-6 h-6 text-[#FFFFFF]/60 transition-transform ${expandedCategory === index ? 'rotate-180' : ''
+                  }`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -80,14 +79,14 @@ export default function CategoryBreakdown({ categories }: CategoryBreakdownProps
 
             {/* Expanded Details */}
             {expandedCategory === index && (
-              <div className="p-6 bg-gray-50 border-t-2 border-gray-200 space-y-6">
+              <div className="p-6 bg-[#0F001E] border-t-2 border-[#FFFFFF]/20 space-y-6">
                 {/* Evidence */}
                 <div>
-                  <h4 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                    <span className="text-blue-600">🔍</span>
+                  <h4 className="font-semibold text-[#FFFFFF] mb-2 flex items-center gap-2">
+                    <span className="text-blue-400">🔍</span>
                     Evidence from Call
                   </h4>
-                  <p className="text-gray-600 italic bg-white p-4 rounded-lg border-l-4 border-blue-500">
+                  <p className="text-[#FFFFFF]/80 italic bg-[#0F001E] border border-blue-400 p-4 rounded-lg">
                     {category.evidence}
                   </p>
                 </div>
@@ -95,15 +94,15 @@ export default function CategoryBreakdown({ categories }: CategoryBreakdownProps
                 {/* Strengths */}
                 {category.strengths && category.strengths.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                      <span className="text-green-600">✅</span>
+                    <h4 className="font-semibold text-[#FFFFFF] mb-3 flex items-center gap-2">
+                      <span className="text-green-400">✅</span>
                       What You Did Well
                     </h4>
                     <ul className="space-y-2">
                       {category.strengths.map((strength, idx) => (
-                        <li key={idx} className="flex items-start gap-3 bg-white p-3 rounded-lg">
-                          <span className="text-green-500 font-bold mt-1">+</span>
-                          <span className="text-gray-700">{strength}</span>
+                        <li key={idx} className="flex items-start gap-3 bg-[#0F001E] border border-green-400 p-3 rounded-lg">
+                          <span className="text-green-400 font-bold mt-1">+</span>
+                          <span className="text-[#FFFFFF]/80">{strength}</span>
                         </li>
                       ))}
                     </ul>
@@ -113,15 +112,15 @@ export default function CategoryBreakdown({ categories }: CategoryBreakdownProps
                 {/* Improvements */}
                 {category.improvements && category.improvements.length > 0 && (
                   <div>
-                    <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                      <span className="text-orange-600">💡</span>
+                    <h4 className="font-semibold text-[#FFFFFF] mb-3 flex items-center gap-2">
+                      <span className="text-orange-400">💡</span>
                       Areas to Improve
                     </h4>
                     <ul className="space-y-2">
                       {category.improvements.map((improvement, idx) => (
-                        <li key={idx} className="flex items-start gap-3 bg-white p-3 rounded-lg border-l-4 border-orange-400">
-                          <span className="text-orange-500 font-bold mt-1">→</span>
-                          <span className="text-gray-700">{improvement}</span>
+                        <li key={idx} className="flex items-start gap-3 bg-[#0F001E] border border-orange-400 p-3 rounded-lg">
+                          <span className="text-orange-400 font-bold mt-1">→</span>
+                          <span className="text-[#FFFFFF]/80">{improvement}</span>
                         </li>
                       ))}
                     </ul>

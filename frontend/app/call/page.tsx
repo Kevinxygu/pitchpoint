@@ -323,33 +323,41 @@ export default function CallPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-700 flex flex-col p-6">
+        <div className="min-h-screen flex flex-col p-6 bg-[#0F001E]">
             {/* Error Banner */}
             {error && (
-                <div className="mb-4 p-4 bg-red-500/20 border border-red-500 rounded-lg flex items-center gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-400" />
+                <div className="mb-4 p-4 bg-[#DE0037]/20 border border-[#DE0037] rounded-lg flex items-center gap-3">
+                    <AlertCircle className="w-5 h-5 text-[#DE0037]" />
                     <div>
-                        <p className="text-white font-medium">Connection Error</p>
-                        <p className="text-white/80 text-sm">{error}</p>
+                        <p className="text-[#FFFFFF] font-medium">Connection Error</p>
+                        <p className="text-[#FFFFFF]/80 text-sm">{error}</p>
                     </div>
                 </div>
             )}
 
-            <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left: Video Area */}
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
+                {/* Left: Video Area with Gradient Background */}
                 <div className="lg:col-span-2 flex flex-col gap-4">
-                    <div className="relative flex-1 bg-blue-800/30 rounded-lg overflow-hidden min-h-[500px]">
+                    <div
+                        className="relative flex-1 rounded-lg overflow-hidden min-h-[500px] border-2 border-[#DE0037]"
+                        style={{
+                            backgroundImage: 'url(/images/call-gradient.png)',
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat'
+                        }}
+                    >
                         {/* AI Prospect Avatar */}
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <div className="w-48 h-48 rounded-full bg-blue-500 flex items-center justify-center text-white text-6xl font-bold shadow-lg">
+                            <div className="w-48 h-48 rounded-full bg-[#DE0037] flex items-center justify-center text-[#FFFFFF] text-6xl font-bold shadow-lg">
                                 {persona ? getInitials(persona.name) : 'AI'}
                             </div>
                             {persona && (
                                 <div className="mt-6 text-center">
-                                    <p className="text-2xl font-semibold text-white">
+                                    <p className="text-2xl font-semibold text-[#FFFFFF]">
                                         {persona.name}
                                     </p>
-                                    <p className="text-lg text-white/80">
+                                    <p className="text-lg text-[#FFFFFF]/80">
                                         {persona.role} at {persona.company}
                                     </p>
                                 </div>
@@ -357,7 +365,7 @@ export default function CallPage() {
                         </div>
 
                         {/* User video (PIP) */}
-                        <div className="absolute bottom-4 right-4 w-40 h-28 rounded-lg overflow-hidden border-2 border-white/20 bg-black">
+                        <div className="absolute bottom-4 right-4 w-40 h-28 rounded-lg overflow-hidden border-2 border-[#FFFFFF]/20 bg-[#0F001E]">
                             {isVideoOn ? (
                                 <video
                                     ref={videoRef}
@@ -367,27 +375,27 @@ export default function CallPage() {
                                     className="w-full h-full object-cover scale-x-[-1]"
                                 />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-gray-800">
-                                    <VideoOff className="w-8 h-8 text-white/60" />
+                                <div className="w-full h-full flex items-center justify-center bg-[#0F001E]">
+                                    <VideoOff className="w-8 h-8 text-[#FFFFFF]/60" />
                                 </div>
                             )}
                         </div>
 
                         {/* Timer */}
-                        <div className="absolute top-4 left-4 px-4 py-2 bg-black/50 rounded-lg text-white font-medium">
+                        <div className="absolute top-4 left-4 px-4 py-2 bg-[#0F001E]/80 rounded-lg text-[#FFFFFF] font-medium">
                             {formatTime(callDuration)}
                         </div>
 
                         {/* Status indicators */}
                         {!isConnected && (
-                            <div className="absolute top-4 right-4 px-4 py-2 bg-yellow-500/80 rounded-lg text-white text-sm flex items-center gap-2">
+                            <div className="absolute top-4 right-4 px-4 py-2 bg-yellow-500/80 rounded-lg text-[#FFFFFF] text-sm flex items-center gap-2">
                                 <Loader2 className="w-4 h-4 animate-spin" />
                                 {connectionStatus}
                             </div>
                         )}
 
                         {isListening && (
-                            <div className="absolute top-16 right-4 px-4 py-2 bg-green-500/80 rounded-lg text-white text-sm flex items-center gap-2">
+                            <div className="absolute top-16 right-4 px-4 py-2 bg-[#DE0037]/80 rounded-lg text-[#FFFFFF] text-sm flex items-center gap-2">
                                 <Mic className="w-4 h-4" />
                                 Listening...
                             </div>
@@ -395,32 +403,34 @@ export default function CallPage() {
                     </div>
                 </div>
 
-                {/* Right: Transcript */}
-                <div className="flex flex-col border border-white/20 rounded-lg overflow-hidden bg-white/5">
-                    <div className="p-4 border-b border-white/20">
-                        <h3 className="text-lg font-semibold text-white">Live Transcript</h3>
-                        <p className="text-sm text-white/60">
+                {/* Right: Transcript - Fixed and Scrollable */}
+                <div className="flex flex-col border border-palette-red rounded-lg overflow-hidden bg-[#0F001E] h-full max-h-[calc(100vh-200px)]">
+                    <div className="p-4 border-b border-palette-red flex-shrink-0">
+                        <h3 className="text-lg font-semibold text-[#FFFFFF]">Live Transcript</h3>
+                        <p className="text-sm text-white">
                             {persona?.name || 'AI Prospect'} • {persona?.company}
                         </p>
-                        <p className="text-xs text-white/40 mt-1">
+                        {/* <p className="text-xs text-[#FFFFFF]/40 mt-1">
                             Status: {connectionStatus}
-                        </p>
+                        </p> */}
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-[#DE0037] scrollbar-track-[#0F001E]">
                         {messages.length === 0 ? (
                             <div className="flex items-center justify-center h-full">
-                                <p className="text-white/40 text-sm">
+                                <p className="text-[#FFFFFF]/40 text-sm">
                                     {isConnected ? 'Start talking...' : connectionStatus}
                                 </p>
                             </div>
                         ) : (
                             messages.map((msg, index) => (
                                 <div key={index} className="space-y-1">
-                                    <p className="text-sm font-semibold text-white">
+                                    <p className={`text-sm font-semibold ${msg.speaker === 'user' ? 'text-[#DE0037]' : 'text-[#FFFFFF]'}`}>
                                         {msg.speaker === 'user' ? 'You' : persona?.name}
                                     </p>
-                                    <p className="text-sm text-white/80">{msg.text}</p>
+                                    <p className={`text-sm ${msg.speaker === 'user' ? 'text-[#DE0037]/90' : 'text-[#FFFFFF]/80'}`}>
+                                        {msg.text}
+                                    </p>
                                 </div>
                             ))
                         )}
@@ -432,27 +442,31 @@ export default function CallPage() {
             <div className="flex items-center justify-center gap-4 mt-6">
                 <button
                     onClick={() => setIsVideoOn(!isVideoOn)}
-                    className={`p-4 rounded-lg transition-colors ${isVideoOn ? 'bg-white/10 hover:bg-white/20' : 'bg-red-500 hover:bg-red-600'
+                    className={`p-4 rounded-lg transition-colors ${isVideoOn
+                        ? 'bg-[#FFFFFF] hover:bg-[#FFFFFF]/90 text-[#0F001E]'
+                        : 'bg-[#DE0037] hover:bg-[#DE0037]/90 text-[#FFFFFF]'
                         }`}
                 >
-                    {isVideoOn ? <Video className="w-6 h-6 text-white" /> : <VideoOff className="w-6 h-6 text-white" />}
+                    {isVideoOn ? <Video className="w-6 h-6" /> : <VideoOff className="w-6 h-6" />}
                 </button>
 
                 <button
                     onClick={toggleMic}
                     disabled={!isConnected}
-                    className={`p-4 rounded-lg transition-colors ${!isMuted ? 'bg-white/10 hover:bg-white/20' : 'bg-red-500 hover:bg-red-600'
+                    className={`p-4 rounded-lg transition-colors ${!isMuted
+                        ? 'bg-[#FFFFFF] hover:bg-[#FFFFFF]/90 text-[#0F001E]'
+                        : 'bg-[#DE0037] hover:bg-[#DE0037]/90 text-[#FFFFFF]'
                         } disabled:opacity-50`}
                 >
-                    {!isMuted ? <Mic className="w-6 h-6 text-white" /> : <MicOff className="w-6 h-6 text-white" />}
+                    {!isMuted ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
                 </button>
 
                 <button
                     onClick={handleEndCall}
-                    className="px-12 py-4 bg-red-500 hover:bg-red-600 rounded-lg transition-colors flex items-center gap-2"
+                    className="px-12 py-4 bg-[#DE0037] hover:bg-[#DE0037]/90 rounded-lg transition-colors flex items-center gap-2"
                 >
-                    <Phone className="w-6 h-6 text-white rotate-[135deg]" />
-                    <span className="text-white font-medium">End Call</span>
+                    <Phone className="w-6 h-6 text-[#FFFFFF] rotate-[135deg]" />
+                    <span className="text-[#FFFFFF] font-medium">End Call</span>
                 </button>
             </div>
 
@@ -461,7 +475,7 @@ export default function CallPage() {
                 <div className="text-center mt-4">
                     <button
                         onClick={startListening}
-                        className="px-6 py-3 bg-green-500 hover:bg-green-600 rounded-lg text-white font-medium transition-colors"
+                        className="px-6 py-3 bg-[#FFFFFF] hover:bg-[#FFFFFF]/90 text-[#0F001E] rounded-lg font-medium transition-colors"
                     >
                         Click to Start Talking
                     </button>
@@ -470,7 +484,7 @@ export default function CallPage() {
 
             {/* Debug info */}
             <div className="text-center mt-2">
-                <p className="text-white/40 text-xs">
+                <p className="text-[#FFFFFF]/40 text-xs">
                     Backend: {process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'}
                     {' • '}
                     Session: {sessionId?.slice(0, 8) || 'None'}

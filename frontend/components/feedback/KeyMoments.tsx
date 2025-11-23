@@ -16,12 +16,12 @@ export default function KeyMoments({ moments }: KeyMomentsProps) {
   // Determine if moment was positive or negative based on impact text
   const getMomentType = (impact: string) => {
     const lowerImpact = impact.toLowerCase();
-    if (lowerImpact.includes('strong') || lowerImpact.includes('excellent') || 
-        lowerImpact.includes('positive') || lowerImpact.includes('good')) {
+    if (lowerImpact.includes('strong') || lowerImpact.includes('excellent') ||
+      lowerImpact.includes('positive') || lowerImpact.includes('good')) {
       return 'positive';
     }
-    if (lowerImpact.includes('missed') || lowerImpact.includes('weak') || 
-        lowerImpact.includes('negative') || lowerImpact.includes('opportunity')) {
+    if (lowerImpact.includes('missed') || lowerImpact.includes('weak') ||
+      lowerImpact.includes('negative') || lowerImpact.includes('opportunity')) {
       return 'negative';
     }
     return 'neutral';
@@ -54,11 +54,11 @@ export default function KeyMoments({ moments }: KeyMomentsProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-8">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+    <div className="bg-[#0F001E] border-1 border-[#DE0037] rounded-lg shadow-lg p-8">
+      <h2 className="text-2xl font-bold text-[#FFFFFF] mb-6">
         🎯 Key Moments
       </h2>
-      <p className="text-gray-600 mb-6">
+      <p className="text-[#FFFFFF]/60 mb-6">
         Critical turning points that significantly impacted the call's outcome
       </p>
 
@@ -70,7 +70,7 @@ export default function KeyMoments({ moments }: KeyMomentsProps) {
           return (
             <div
               key={index}
-              className={`${styles.bg} border-l-4 ${styles.border} rounded-lg p-5 hover:shadow-md transition`}
+              className={`bg-[#0F001E] border-2 ${styles.border} rounded-lg p-5 hover:shadow-md transition`}
             >
               <div className="flex items-start gap-4">
                 <div className={`text-2xl ${styles.iconColor}`}>
@@ -78,14 +78,14 @@ export default function KeyMoments({ moments }: KeyMomentsProps) {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-xs font-semibold text-gray-500 bg-white px-3 py-1 rounded-full">
+                    <span className="text-xs font-semibold text-[#FFFFFF]/60 bg-[#0F001E] border border-[#FFFFFF]/20 px-3 py-1 rounded-full">
                       {moment.timestamp}
                     </span>
                   </div>
-                  <h3 className="font-semibold text-gray-800 mb-2">
+                  <h3 className="font-semibold text-[#FFFFFF] mb-2">
                     {moment.moment}
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-[#FFFFFF]/80 text-sm">
                     <span className="font-medium">Impact:</span> {moment.impact}
                   </p>
                 </div>

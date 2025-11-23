@@ -25,11 +25,7 @@ export default function OverallScore({ overall }: OverallScoreProps) {
   };
 
   const getGradeBgColor = (score: number) => {
-    if (score >= 90) return 'bg-green-100 border-green-500';
-    if (score >= 80) return 'bg-blue-100 border-blue-500';
-    if (score >= 70) return 'bg-yellow-100 border-yellow-500';
-    if (score >= 60) return 'bg-orange-100 border-orange-500';
-    return 'bg-red-100 border-red-500';
+    return 'bg-palette-background-black'
   };
 
   const getProgressColor = (score: number) => {
@@ -41,11 +37,11 @@ export default function OverallScore({ overall }: OverallScoreProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-8">
+    <div className="bg-[#0F001E] border-1 border-[#DE0037] rounded-lg shadow-lg p-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Overall Performance</h2>
-        <div className={`px-6 py-3 rounded-lg border-2 ${getGradeBgColor(overall.weighted_score)}`}>
-          <p className={`text-3xl font-bold ${getScoreColor(overall.weighted_score)}`}>
+        <h2 className="text-2xl font-bold text-[#FFFFFF]">Overall Performance</h2>
+        <div className={`px-6 py-3 rounded-lg border-2 bg-palette-background-black`}>
+          <p className={`text-2xl ${getScoreColor(overall.weighted_score)}`}>
             {overall.grade}
           </p>
         </div>
@@ -62,7 +58,7 @@ export default function OverallScore({ overall }: OverallScoreProps) {
               stroke="currentColor"
               strokeWidth="8"
               fill="transparent"
-              className="text-gray-200"
+              className="text-[#FFFFFF]/20"
             />
             <circle
               cx="64"
@@ -85,20 +81,20 @@ export default function OverallScore({ overall }: OverallScoreProps) {
         </div>
 
         <div className="flex-1">
-          <p className="text-gray-700 text-lg leading-relaxed">
+          <p className="text-[#FFFFFF] text-lg leading-relaxed">
             {overall.summary}
           </p>
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+      <div className="w-full bg-[#FFFFFF]/20 rounded-full h-3 mb-2">
         <div
           className={`h-3 rounded-full transition-all duration-1000 ${getProgressColor(overall.weighted_score)}`}
           style={{ width: `${overall.weighted_score}%` }}
         />
       </div>
-      <div className="flex justify-between text-xs text-gray-500">
+      <div className="flex justify-between text-xs text-[#FFFFFF]/60">
         <span>0</span>
         <span>50</span>
         <span>100</span>

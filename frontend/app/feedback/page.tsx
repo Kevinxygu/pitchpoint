@@ -103,13 +103,13 @@ export default function FeedbackPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-                    <div className="text-red-600 text-xl font-bold mb-4">⚠️ Error</div>
-                    <p className="text-gray-700 mb-6">{error}</p>
+            <div className="min-h-screen bg-[#0F001E] flex items-center justify-center p-4">
+                <div className="bg-[#0F001E] border-2 border-[#DE0037] rounded-lg shadow-lg p-8 max-w-md w-full">
+                    <div className="text-[#DE0037] text-xl font-bold mb-4">⚠️ Error</div>
+                    <p className="text-[#FFFFFF] mb-6">{error}</p>
                     <button
                         onClick={() => window.location.href = '/'}
-                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+                        className="w-full bg-[#DE0037] text-[#FFFFFF] py-2 px-4 rounded-lg hover:bg-[#DE0037]/90 transition"
                     >
                         Return to Home
                     </button>
@@ -123,7 +123,7 @@ export default function FeedbackPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[#0F001E]">
             {/* Header */}
             <FeedbackHeader sessionId={sessionId} />
 
@@ -151,13 +151,13 @@ export default function FeedbackPage() {
                 />
 
                 {/* Transcript View (collapsible) */}
-                <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="bg-[#0F001E] border-2 border-[#DE0037] rounded-lg shadow-lg p-6">
                     <details>
-                        <summary className="text-lg font-semibold text-gray-800 cursor-pointer hover:text-blue-600 transition">
+                        <summary className="text-lg font-semibold text-[#FFFFFF] cursor-pointer hover:text-[#DE0037] transition">
                             Call Transcript:
                         </summary>
-                        <div className="mt-4 p-4 bg-gray-50 rounded-lg max-h-96 overflow-y-auto">
-                            <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
+                        <div className="mt-4 p-4 bg-[#0F001E] border border-[#FFFFFF]/20 rounded-lg max-h-96 overflow-y-auto">
+                            <pre className="text-sm text-[#FFFFFF] whitespace-pre-wrap font-mono">
                                 {transcript}
                             </pre>
                         </div>
@@ -168,13 +168,13 @@ export default function FeedbackPage() {
                 <div className="flex gap-4 justify-center pb-8">
                     <button
                         onClick={() => window.location.href = '/'}
-                        className="px-6 py-3 bg-white border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium"
+                        className="px-6 py-3 bg-[#0F001E] border-2 border-[#DE0037] text-[#FFFFFF] rounded-lg hover:bg-[#DE0037]/10 transition font-medium"
                     >
                         Practice Again
                     </button>
                     <button
                         onClick={() => window.print()}
-                        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                        className="px-6 py-3 bg-[#DE0037] text-[#FFFFFF] rounded-lg hover:bg-[#DE0037]/90 transition font-medium"
                     >
                         📄 Export Report
                     </button>
