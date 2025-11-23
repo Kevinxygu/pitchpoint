@@ -13,7 +13,8 @@ export default function TestCallPage() {
             role: "VP of Sales",
             company: "TechCorp",
             difficulty: "medium",
-            background: "Experienced sales professional interested in new solutions."
+            background: "Experienced sales professional interested in new solutions.",
+            personality: "enthusiastic"
         }
 
         // Store in sessionStorage

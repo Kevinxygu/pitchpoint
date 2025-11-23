@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth0 } from '@auth0/auth0-react'
 import ProfileCard from '@/components/auth/ProfileCard'
 import LogoutButton from '@/components/auth/LogoutButton'
+import CallSettings from './call_settings'
 
 export default function DashboardPage() {
   const { isAuthenticated, isLoading } = useAuth0()
@@ -46,6 +47,8 @@ export default function DashboardPage() {
           </button>
           <LogoutButton />
         </div>
+
+        <CallSettings />
       </div>
     </main>
   )

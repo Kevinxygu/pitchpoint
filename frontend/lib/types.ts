@@ -4,6 +4,7 @@ export interface Persona {
     company: string
     difficulty: 'easy' | 'medium' | 'hard'
     background?: string
+    personality?: string
 }
 
 export interface Message {

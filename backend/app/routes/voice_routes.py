@@ -24,7 +24,8 @@ def start_voice_session():
             'company': data.get('company', 'TechCorp'),
             'difficulty': data.get('difficulty', 'professional'),
             'background': data.get('background', 'Experienced professional.'),
-            'company_info': data.get('comapny_background', '')
+            'company_info': data.get('comapny_background', ''),
+            'personality': data.get('personality', '')
         }
         
         conversation_service.create_conversation(session_id, persona_data)
