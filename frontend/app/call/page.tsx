@@ -187,15 +187,17 @@ function CallContent() {
         try {
             if (!audioContextRef.current) {
                 audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
-
-                // ✨ CRITICAL: Resume immediately for HTTPS
-                if (audioContextRef.current.state === 'suspended') {
-                    await audioContextRef.current.resume()
-                }
-
-                setAudioContextReady(true)
-                console.log('✅ AudioContext initialized and resumed')
+                console.log('🎵 AudioContext created, state:', audioContextRef.current.state)
             }
+
+            // ✨ CRITICAL: Always resume AudioContext for HTTPS
+            if (audioContextRef.current.state !== 'running') {
+                await audioContextRef.current.resume()
+                console.log('✅ AudioContext resumed, state:', audioContextRef.current.state)
+            }
+
+            setAudioContextReady(true)
+            console.log('✅ AudioContext fully initialized and ready')
         } catch (error) {
             console.error('❌ Failed to initialize AudioContext:', error)
             setError('Failed to initialize audio. Please check browser permissions.')
@@ -346,40 +348,34 @@ function CallContent() {
                 audio.volume = 1.0
                 audio.preload = 'auto'
 
-                // ✨ CRITICAL: Handle all audio events
-                audio.oncanplaythrough = async () => {
-                    try {
-                        await audio.play()
-                        console.log('✅ Audio playing')
-                    } catch (playError) {
-                        console.error('❌ Play error:', playError)
-                        reject(playError)
-                    }
-                }
-
-                audio.onended = () => {
-                    console.log('✅ Audio chunk finished')
-                    URL.revokeObjectURL(url)
-                    currentAudioRef.current = null
-                    resolve()
-                }
-
-                audio.onerror = (e) => {
-                    console.error('❌ Audio error:', e)
-                    URL.revokeObjectURL(url)
-                    setError('Audio playback error. Please check your connection.')
-                    reject(new Error('Audio playback failed'))
-                }
-
-                // ✨ NEW: Set timeout for stuck audio
+                // ✨ CRITICAL: Set timeout for stuck audio
                 const timeout = setTimeout(() => {
                     if (currentAudioRef.current === audio) {
                         console.warn('⚠️ Audio timeout, skipping...')
                         audio.pause()
                         URL.revokeObjectURL(url)
+                        currentAudioRef.current = null
                         resolve()
                     }
                 }, 30000) // 30 second timeout
+
+                // ✨ CRITICAL: Handle all audio events
+                audio.oncanplaythrough = async () => {
+                    try {
+                        // Ensure AudioContext is running (critical for HTTPS)
+                        if (audioContextRef.current?.state === 'suspended') {
+                            await audioContextRef.current.resume()
+                        }
+                        await audio.play()
+                        console.log('✅ Audio playing')
+                    } catch (playError) {
+                        console.error('❌ Play error:', playError)
+                        clearTimeout(timeout)
+                        URL.revokeObjectURL(url)
+                        currentAudioRef.current = null
+                        reject(playError)
+                    }
+                }
 
                 audio.onended = () => {
                     clearTimeout(timeout)
@@ -387,6 +383,15 @@ function CallContent() {
                     URL.revokeObjectURL(url)
                     currentAudioRef.current = null
                     resolve()
+                }
+
+                audio.onerror = (e) => {
+                    clearTimeout(timeout)
+                    console.error('❌ Audio error:', e)
+                    URL.revokeObjectURL(url)
+                    currentAudioRef.current = null
+                    setError('Audio playback error. Please check your connection.')
+                    reject(new Error('Audio playback failed'))
                 }
 
                 // Load the audio

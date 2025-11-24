@@ -11,6 +11,9 @@ allowed_origins = os.getenv('ALLOWED_ORIGINS', 'http://localhost:3000').split(',
 
 socketio = SocketIO(
     cors_allowed_origins=allowed_origins,
+    async_mode='threading',
+    ping_timeout=60,
+    ping_interval=25,
     logger=True,
     engineio_logger=True
 )
@@ -27,7 +30,9 @@ def create_app():
             "origins": allowed_origins,
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": True
+            "expose_headers": ["Content-Type"],
+            "supports_credentials": True,
+            "max_age": 3600
         }
     })
     
