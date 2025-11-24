@@ -46,6 +46,11 @@ function CallContent() {
     const streamRef = useRef<MediaStream | null>(null)
     const audioContextRef = useRef<AudioContext | null>(null)
 
+    // ✨ NEW: Audio queue management for seamless playback
+    const audioQueueRef = useRef<string[]>([])
+    const isPlayingRef = useRef<boolean>(false)
+    const currentAudioRef = useRef<HTMLAudioElement | null>(null)
+
     // Initialize session
     useEffect(() => {
         let mounted = true
@@ -112,6 +117,12 @@ function CallContent() {
 
         return () => {
             mounted = false
+            // ✨ UPDATED: Clean up audio queue
+            audioQueueRef.current = []
+            if (currentAudioRef.current) {
+                currentAudioRef.current.pause()
+                currentAudioRef.current = null
+            }
             if (socketRef.current) {
                 console.log('🧹 Cleaning up socket...')
                 socketRef.current.disconnect()
@@ -119,6 +130,9 @@ function CallContent() {
             }
             if (recognitionRef.current) {
                 recognitionRef.current.stop()
+            }
+            if (audioContextRef.current) {
+                audioContextRef.current.close()
             }
         }
     }, [searchParams])
@@ -168,16 +182,23 @@ function CallContent() {
         }
     }, [isListening])
 
-    // ✨ NEW: Function to initialize AudioContext with user interaction
-    const initAudioContext = () => {
+    // Function to initialize AudioContext with user interaction
+    const initAudioContext = async () => {
         try {
             if (!audioContextRef.current) {
                 audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+
+                // ✨ CRITICAL: Resume immediately for HTTPS
+                if (audioContextRef.current.state === 'suspended') {
+                    await audioContextRef.current.resume()
+                }
+
                 setAudioContextReady(true)
-                console.log('✅ AudioContext initialized')
+                console.log('✅ AudioContext initialized and resumed')
             }
         } catch (error) {
             console.error('❌ Failed to initialize AudioContext:', error)
+            setError('Failed to initialize audio. Please check browser permissions.')
         }
     }
 
@@ -197,7 +218,9 @@ function CallContent() {
             reconnectionAttempts: 5,
             reconnectionDelay: 1000,
             timeout: 20000,
-            autoConnect: true
+            autoConnect: true,
+            // ✨ NEW: Ensure transports work with HTTPS
+            transports: ['websocket', 'polling']
         })
 
         socket.on('connect', () => {
@@ -226,8 +249,9 @@ function CallContent() {
         })
 
         socket.on('ai_audio', async (data: { audio: string; text: string }) => {
-            console.log('🔊 Received AI audio')
-            await playAudio(data.audio)
+            console.log('🔊 Received AI audio chunk')
+            // ✨ NEW: Add to queue instead of playing immediately
+            queueAudio(data.audio)
         })
 
         socket.on('connect_error', (error) => {
@@ -242,7 +266,6 @@ function CallContent() {
             setConnectionStatus('Disconnected')
 
             if (reason === 'io server disconnect') {
-                // Server disconnected, try reconnecting
                 socket.connect()
             }
         })
@@ -255,79 +278,125 @@ function CallContent() {
         socketRef.current = socket
     }
 
-    // ✨ UPDATED: Enhanced audio playback with better HTTPS support
-    const playAudio = async (audioBase64: string) => {
+    // ✨ NEW: Queue audio for sequential playback
+    const queueAudio = (audioBase64: string) => {
+        console.log('📥 Adding audio to queue, queue length:', audioQueueRef.current.length + 1)
+        audioQueueRef.current.push(audioBase64)
+
+        // Start playing if not already playing
+        if (!isPlayingRef.current) {
+            playNextInQueue()
+        }
+    }
+
+    // ✨ NEW: Play next audio in queue
+    const playNextInQueue = async () => {
+        if (audioQueueRef.current.length === 0) {
+            isPlayingRef.current = false
+            console.log('✅ Audio queue empty')
+            return
+        }
+
+        isPlayingRef.current = true
+        const audioBase64 = audioQueueRef.current.shift()!
+
         try {
-            console.log('🔊 Starting audio playback...')
-
-            // ✨ NEW: Ensure AudioContext exists and is running
-            if (!audioContextRef.current) {
-                audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
-                setAudioContextReady(true)
-            }
-
-            // ✨ NEW: Resume AudioContext if suspended (required for HTTPS)
-            if (audioContextRef.current.state === 'suspended') {
-                await audioContextRef.current.resume()
-                console.log('✅ AudioContext resumed')
-            }
-
-            // Decode base64 to array buffer
-            const audioData = Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0))
-
-            // Create audio element
-            const blob = new Blob([audioData], { type: 'audio/mpeg' })
-            const url = URL.createObjectURL(blob)
-            const audio = new Audio(url)
-
-            // ✨ NEW: Set volume explicitly
-            audio.volume = 1.0
-
-            // ✨ NEW: Wait for audio to be ready before playing
-            await new Promise((resolve, reject) => {
-                audio.oncanplaythrough = resolve
-                audio.onerror = reject
-                audio.load()
-            })
-
-            // ✨ NEW: Explicitly play with error handling
-            const playPromise = audio.play()
-
-            if (playPromise !== undefined) {
-                await playPromise
-                console.log('✅ Audio playing successfully')
-            }
-
-            // Cleanup
-            audio.onended = () => {
-                URL.revokeObjectURL(url)
-                console.log('✅ Audio finished and cleaned up')
-            }
+            await playAudioChunk(audioBase64)
         } catch (error) {
-            console.error('❌ Error playing audio:', error)
-            // ✨ NEW: More detailed error reporting
-            setError(`Audio playback failed: ${error instanceof Error ? error.message : 'Unknown error'}. Please check browser permissions.`)
+            console.error('❌ Error playing audio chunk:', error)
+        }
 
-            // ✨ NEW: Try fallback method with AudioContext
+        // Play next in queue
+        playNextInQueue()
+    }
+
+    // ✨ COMPLETELY REWRITTEN: Proper audio playback for ElevenLabs
+    const playAudioChunk = async (audioBase64: string): Promise<void> => {
+        return new Promise(async (resolve, reject) => {
             try {
-                console.log('🔄 Attempting fallback audio playback...')
+                console.log('🔊 Playing audio chunk...')
+
+                // Ensure AudioContext is ready
                 if (!audioContextRef.current) {
-                    audioContextRef.current = new AudioContext()
+                    await initAudioContext()
                 }
 
-                const audioData = Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0))
-                const audioBuffer = await audioContextRef.current.decodeAudioData(audioData.buffer)
+                // Resume if suspended
+                if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+                    await audioContextRef.current.resume()
+                }
 
-                const source = audioContextRef.current.createBufferSource()
-                source.buffer = audioBuffer
-                source.connect(audioContextRef.current.destination)
-                source.start(0)
+                // ✨ CRITICAL FIX: Decode base64 properly
+                const binaryString = atob(audioBase64)
+                const bytes = new Uint8Array(binaryString.length)
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i)
+                }
 
-                console.log('✅ Audio playing via AudioContext fallback')
-            } catch (fallbackError) {
-                console.error('❌ Fallback audio method also failed:', fallbackError)
+                // ✨ CRITICAL: Create blob with proper MIME type
+                // ElevenLabs typically sends MP3, but check your backend
+                const blob = new Blob([bytes.buffer], { type: 'audio/mpeg' })
+                const url = URL.createObjectURL(blob)
+
+                // Create audio element
+                const audio = new Audio()
+                currentAudioRef.current = audio
+
+                audio.src = url
+                audio.volume = 1.0
+                audio.preload = 'auto'
+
+                // ✨ CRITICAL: Handle all audio events
+                audio.oncanplaythrough = async () => {
+                    try {
+                        await audio.play()
+                        console.log('✅ Audio playing')
+                    } catch (playError) {
+                        console.error('❌ Play error:', playError)
+                        reject(playError)
+                    }
+                }
+
+                audio.onended = () => {
+                    console.log('✅ Audio chunk finished')
+                    URL.revokeObjectURL(url)
+                    currentAudioRef.current = null
+                    resolve()
+                }
+
+                audio.onerror = (e) => {
+                    console.error('❌ Audio error:', e)
+                    URL.revokeObjectURL(url)
+                    setError('Audio playback error. Please check your connection.')
+                    reject(new Error('Audio playback failed'))
+                }
+
+                // ✨ NEW: Set timeout for stuck audio
+                const timeout = setTimeout(() => {
+                    if (currentAudioRef.current === audio) {
+                        console.warn('⚠️ Audio timeout, skipping...')
+                        audio.pause()
+                        URL.revokeObjectURL(url)
+                        resolve()
+                    }
+                }, 30000) // 30 second timeout
+
+                audio.onended = () => {
+                    clearTimeout(timeout)
+                    console.log('✅ Audio chunk finished')
+                    URL.revokeObjectURL(url)
+                    currentAudioRef.current = null
+                    resolve()
+                }
+
+                // Load the audio
+                audio.load()
+
+            } catch (error) {
+                console.error('❌ Error in playAudioChunk:', error)
+                reject(error)
             }
-        }
+        })
     }
 
     // Start voice recognition (push-to-talk)
@@ -338,7 +407,7 @@ function CallContent() {
             return
         }
 
-        // ✨ NEW: Initialize AudioContext on first interaction
+        // Initialize AudioContext on first interaction
         if (!audioContextRef.current) {
             initAudioContext()
         }
@@ -434,12 +503,19 @@ function CallContent() {
 
         // Stop everything
         stopListening()
+
+        // ✨ NEW: Clear audio queue
+        audioQueueRef.current = []
+        if (currentAudioRef.current) {
+            currentAudioRef.current.pause()
+            currentAudioRef.current = null
+        }
+
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(track => track.stop())
         }
 
         // Save transcript and navigate
-        // Format messages into a readable transcript string
         const formattedTranscript = messages
             .map(msg => `${msg.speaker === 'user' ? 'You' : persona?.name || 'AI'}: ${msg.text}`)
             .join('\n\n')
@@ -466,18 +542,18 @@ function CallContent() {
                 <div className="mb-4 p-4 bg-[#DE0037]/20 border border-[#DE0037] rounded-lg flex items-center gap-3">
                     <AlertCircle className="w-5 h-5 text-[#DE0037]" />
                     <div>
-                        <p className="text-[#FFFFFF] font-medium">Connection Error</p>
+                        <p className="text-[#FFFFFF] font-medium">Error</p>
                         <p className="text-[#FFFFFF]/80 text-sm">{error}</p>
                     </div>
                 </div>
             )}
 
-            {/* ✨ NEW: Audio status indicator */}
+            {/* Audio status indicator */}
             {!audioContextReady && isConnected && (
                 <div className="mb-4 p-3 bg-yellow-500/20 border border-yellow-500 rounded-lg flex items-center gap-3">
                     <AlertCircle className="w-4 h-4 text-yellow-500" />
                     <p className="text-yellow-500 text-sm">
-                        Audio will initialize on first interaction (click "Hold to Talk")
+                        Click "Hold to Talk" to enable audio
                     </p>
                 </div>
             )}
@@ -547,6 +623,14 @@ function CallContent() {
                                 Listening...
                             </div>
                         )}
+
+                        {/* ✨ NEW: Audio playing indicator */}
+                        {isPlayingRef.current && (
+                            <div className="absolute top-28 right-4 px-4 py-2 bg-green-500/80 rounded-lg text-[#FFFFFF] text-sm flex items-center gap-2">
+                                <div className="w-2 h-2 bg-[#FFFFFF] rounded-full animate-pulse" />
+                                AI Speaking...
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -557,9 +641,6 @@ function CallContent() {
                         <p className="text-sm text-white">
                             {persona?.name || 'AI Prospect'} • {persona?.company}
                         </p>
-                        {/* <p className="text-xs text-[#FFFFFF]/40 mt-1">
-                            Status: {connectionStatus}
-                        </p> */}
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-[#DE0037] scrollbar-track-[#0F001E]">
@@ -629,9 +710,10 @@ function CallContent() {
                     Backend: {process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'}
                     {' • '}
                     Session: {sessionId?.slice(0, 8) || 'None'}
-                    {/* ✨ NEW: Audio status in debug info */}
                     {' • '}
-                    Audio: {audioContextReady ? '✅ Ready' : '⏳ Waiting'}
+                    Audio: {audioContextReady ? '✅' : '⏳'}
+                    {' • '}
+                    Queue: {audioQueueRef.current.length}
                 </p>
             </div>
         </div>
