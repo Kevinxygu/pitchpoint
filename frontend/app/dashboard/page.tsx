@@ -41,7 +41,8 @@ export default function DashboardPage() {
   }
 
   const get_company_info = async (companyName: string) => {
-    const response = await fetch('http://localhost:5001/research', {
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'
+    const response = await fetch(`${backendUrl}/research`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

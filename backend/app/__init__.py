@@ -35,9 +35,10 @@ def create_app():
     socketio.init_app(app)
     
     # Register routes
-    from app.routes import voice_routes, feedback_routes
+    from app.routes import voice_routes, feedback_routes, research_routes
     app.register_blueprint(voice_routes.bp)
     app.register_blueprint(feedback_routes.bp)
+    app.register_blueprint(research_routes.bp)
     
     @app.route('/health', methods=['GET'])
     def health_check():

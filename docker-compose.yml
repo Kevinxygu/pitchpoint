@@ -24,6 +24,7 @@ services:
       - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
       - ELEVENLABS_VOICE_ID=${ELEVENLABS_VOICE_ID:-21m00Tcm4TlvDq8ikWAM}
       - COHERE_API_KEY=${COHERE_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     
     # Mount code for hot reload
     volumes:
@@ -67,37 +68,7 @@ services:
     networks:
       - pitchlab-network
 
-  # ============================================================================
-  # RESEARCH AGENT SERVICE (Python Flask)
-  # ============================================================================
-  research-agent:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    
-    container_name: pitchlab-research-agent
-    
-    ports:
-      - "5001:5001"
-    
-    environment:
-      - HOST=0.0.0.0
-      - PORT=5001
-      # API Keys - load from .env file
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-    
-    # Mount code for hot reload
-    volumes:
-      - ./backend:/app
-      - /app/__pycache__
-    
-    # Run the research agent server
-    command: python agent/server.py
-    
-    restart: unless-stopped
-    
-    networks:
-      - pitchlab-network
+
 
 # ============================================================================
 # NETWORKS
