@@ -251,7 +251,12 @@ function CallContent() {
         })
 
         socket.on('ai_audio', async (data: { audio: string; text: string }) => {
-            console.log('🔊 Received AI audio chunk')
+            console.log('🔊 Received AI audio chunk, size:', data.audio?.length || 0, 'bytes')
+            console.log('📝 Audio text:', data.text)
+            if (!data.audio) {
+                console.error('❌ No audio data in response!')
+                return
+            }
             // ✨ NEW: Add to queue instead of playing immediately
             queueAudio(data.audio)
         })

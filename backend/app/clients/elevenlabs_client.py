@@ -19,6 +19,15 @@ class ElevenLabsClient:
             Audio bytes (MP3)
         """
         try:
+            if not self.api_key:
+                print("❌ ELEVENLABS_API_KEY not set!")
+                return b''
+            
+            print(f"🎙️ ElevenLabs TTS request:")
+            print(f"   Voice ID: {self.voice_id}")
+            print(f"   Text length: {len(text)} chars")
+            print(f"   Text preview: {text[:100]}...")
+            
             # Use the correct API method
             audio_generator = self.client.text_to_speech.convert(
                 voice_id=self.voice_id,
@@ -34,14 +43,19 @@ class ElevenLabsClient:
             
             # Collect audio chunks
             audio_data = b''
+            chunk_count = 0
             for chunk in audio_generator:
                 if chunk:
                     audio_data += chunk
+                    chunk_count += 1
             
+            print(f"✅ ElevenLabs TTS success: {len(audio_data)} bytes in {chunk_count} chunks")
             return audio_data
         
         except Exception as e:
-            print(f"Error in text-to-speech: {e}")
+            print(f"❌ ElevenLabs TTS error: {e}")
+            import traceback
+            traceback.print_exc()
             return b''
 
 # Singleton instance
