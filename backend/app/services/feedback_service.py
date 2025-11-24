@@ -157,15 +157,26 @@ Be specific, constructive, and provide actionable feedback. Reference actual quo
             )
             response_text = response.text.strip()
         
-        # Try to extract JSON if wrapped in markdown code blocks
-        if response_text.startswith("```"):
-            # Remove code block markers
-            response_text = response_text.split("```")[1]
-            if response_text.startswith("json"):
-                response_text = response_text[4:]
-            response_text = response_text.strip()
-        
-        feedback_data = json.loads(response_text)
+        # Robust JSON extraction
+        try:
+            # Find JSON object using regex
+            import re
+            json_match = re.search(r"\{.*\}", response_text, re.DOTALL)
+            if json_match:
+                response_text = json_match.group(0)
+            
+            feedback_data = json.loads(response_text)
+        except json.JSONDecodeError as e:
+            print(f"❌ JSON Parsing Error: {e}")
+            print(f"❌ Raw Response: {response_text}")
+            # Attempt to clean common issues
+            try:
+                # Remove trailing commas (simple regex)
+                cleaned_text = re.sub(r",\s*\}", "}", response_text)
+                cleaned_text = re.sub(r",\s*\]", "]", cleaned_text)
+                feedback_data = json.loads(cleaned_text)
+            except:
+                raise ValueError(f"Failed to parse AI response as JSON: {e}")
         
         # Validate and enhance response
         if "categories" not in feedback_data:
