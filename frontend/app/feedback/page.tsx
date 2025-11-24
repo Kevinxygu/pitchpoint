@@ -46,6 +46,14 @@ interface FeedbackData {
 }
 
 export default function FeedbackPage() {
+    return (
+        <React.Suspense fallback={<LoadingSpinner />}>
+            <FeedbackContent />
+        </React.Suspense>
+    );
+}
+
+function FeedbackContent() {
     const searchParams = useSearchParams();
     const sessionId = searchParams.get('session');
 
@@ -67,7 +75,8 @@ export default function FeedbackPage() {
                 setTranscript(storedTranscript);
 
                 // Call backend to generate feedback
-                const response = await fetch('http://localhost:8080/api/feedback/generate', {
+                const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'
+                const response = await fetch(`${backendUrl}/api/feedback/generate`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -1,12 +1,27 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Video, VideoOff, Mic, MicOff, Phone, Loader2, AlertCircle } from 'lucide-react'
 import { io, Socket } from 'socket.io-client'
 import { Message, Persona } from '@/lib/types'
 
 export default function CallPage() {
+    return (
+        <React.Suspense fallback={
+            <div className="min-h-screen bg-[#0F001E] flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-8 h-8 text-[#DE0037] animate-spin" />
+                    <p className="text-[#FFFFFF]/60">Initializing call...</p>
+                </div>
+            </div>
+        }>
+            <CallContent />
+        </React.Suspense>
+    )
+}
+
+function CallContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
 
