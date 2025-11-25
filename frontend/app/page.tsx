@@ -81,10 +81,10 @@ export default function Home() {
               Sign In
             </button>
             <button
-              className="landing-btn landing-btn-primary"
+              className="landing-btn landing-btn-secondary"
               onClick={handleCreateAccount}
             >
-              Try It Now
+              Join Us Today!
             </button>
           </div>
         </div>
@@ -92,7 +92,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <main className="landing-hero">
-        <div className="landing-hero-content">
+        <div className="landing-hero-content pt-16">
           <h1 className="landing-hero-title">
             Score your dream deal with PitchPoint AI Sales Coach
           </h1>
@@ -108,25 +108,110 @@ export default function Home() {
               className="landing-btn landing-btn-primary landing-btn-large"
               onClick={handleCreateAccount}
             >
-              Try It Now
+              Try For Free*
             </button>
-            <button
+            {/* <button
               className="landing-btn landing-btn-secondary landing-btn-large"
               onClick={handleSignIn}
             >
               Sign In
-            </button>
-            <a
+            </button> */}
+            {/* <a
               href="https://docs.google.com/forms/d/e/1FAIpQLSdsExDvTUdw4FFoDybJBJoMUPOUmOlAZ07qKWfBC4FDicibsg/viewform"
               target="_blank"
               rel="noopener noreferrer"
               className="landing-btn landing-btn-secondary landing-btn-large"
             >
               Join Waitlist
-            </a>
+            </a> */}
           </div>
+          <p className="landing-hero-subtitle text-xs">
+            <i>*Limited time offer</i>
+          </p>
         </div>
       </main>
+
+      {/* Core Functionality Section */}
+      <section className="landing-section mt-24">
+        <div className="landing-section-content pl-24">
+          <div className="landing-section-text">
+            <h2 className="landing-section-title">
+              Practice Every Pitch.<br />
+              Score Every Deal.
+            </h2>
+
+            <div className="landing-feature">
+              <h3 className="landing-feature-title">Master Your Pitch Before Game Day</h3>
+              <p className="landing-feature-text">
+                We simulate sales calls with tailored AI buyer personas powered by your CRM data, past sales calls, and industry research, so you can practice risk-free.
+              </p>
+            </div>
+
+            <div className="landing-feature">
+              <h3 className="landing-feature-title">Every Personality. Every Scenario.</h3>
+              <p className="landing-feature-text">
+                Practice against 6+ personality modes + randomized real-world scenarios for you to succeed every time.
+              </p>
+            </div>
+
+            <div className="landing-feature">
+              <h3 className="landing-feature-title">Right Product, Every Time</h3>
+              <p className="landing-feature-text">
+                Upload your product catalogue and our tailored evaluation rubric finds the best products for every customer, so no deal gets left behind.
+              </p>
+            </div>
+
+            <button
+              className="landing-btn landing-btn-primary landing-btn-large"
+              onClick={handleCreateAccount}
+            >
+              Try a Free Demo
+            </button>
+          </div>
+
+          <div className="landing-section-image">
+            <Image
+              src="/images/laptop-demo.png"
+              alt="PitchPoint Demo"
+              width={800}
+              height={600}
+              className="laptop-demo-image"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Ready to Get Started Section */}
+      <section className="landing-section landing-section-cta">
+        <div className="landing-section-content pl-24">
+          <div className="landing-section-text">
+            <h2 className="landing-section-title">
+              Ready to Get Started?
+            </h2>
+
+            <p className="landing-cta-text">
+              Contact us <a href="mailto:pitchpointdigital@gmail.com" className="landing-email-link">pitchpointdigital@gmail.com</a> and we'll find a plan that fits your team.
+            </p>
+
+            <button
+              className="landing-btn landing-btn-primary landing-btn-large"
+              onClick={handleCreateAccount}
+            >
+              Join Us Today
+            </button>
+          </div>
+
+          <div className="landing-section-image">
+            <Image
+              src="/images/call-demo.png"
+              alt="Call Demo"
+              width={600}
+              height={700}
+              className="call-demo-image pr-24"
+            />
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

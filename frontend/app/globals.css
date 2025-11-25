@@ -416,10 +416,11 @@ body {
 /* Landing Page Styles */
 .landing-page {
   min-height: 100vh;
-  background-image: url('/images/landing-background.png');
+  background-image: url('/images/homepage-background.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
   display: flex;
   flex-direction: column;
 }
@@ -574,6 +575,107 @@ body {
   margin-top: 1rem;
 }
 
+/* Landing Sections */
+.landing-section {
+  padding: 6rem 2rem;
+  position: relative;
+}
+
+.landing-section-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.landing-section-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.landing-section-title {
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.landing-feature {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.landing-feature-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+}
+
+.landing-feature-text {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.landing-section-image {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: visible;
+  margin-right: -2rem;
+}
+
+.laptop-demo-image {
+  width: 100%;
+  height: auto;
+  transform-origin: left center;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
+  transition: transform 0.3s ease;
+}
+
+.call-demo-image {
+  width: 80%;
+  height: auto;
+  border-radius: 20px;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
+  transition: transform 0.3s ease;
+}
+
+.call-demo-image:hover {
+  transform: scale(1.02);
+}
+
+.landing-section-cta {
+  padding-bottom: 8rem;
+}
+
+.landing-cta-text {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.landing-email-link {
+  color: #ffffff;
+  text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.landing-email-link:hover {
+  color: var(--accent);
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .landing-nav-links {
@@ -611,6 +713,20 @@ body {
   .landing-btn-large {
     width: 100%;
     max-width: 300px;
+  }
+
+  .landing-section {
+    padding: 4rem 1.5rem;
+  }
+
+  .landing-section-content {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .landing-section-image {
+    order: -1;
+    width: 80%;
   }
 }
 
