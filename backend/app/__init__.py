@@ -14,6 +14,7 @@ socketio = SocketIO(
     async_mode='threading',
     ping_timeout=60,
     ping_interval=25,
+    max_http_buffer_size=10000000,  # 10MB - handle large audio payloads
     logger=True,
     engineio_logger=True
 )
@@ -24,6 +25,7 @@ def create_app():
     # Configure CORS for all routes
     # Get allowed origins from environment or use defaults
     allowed_origins = os.getenv('ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
+    print(f"🔒 CORS allowed origins: {allowed_origins}")
     
     CORS(app, resources={
         r"/*": {

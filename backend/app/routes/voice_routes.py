@@ -57,7 +57,9 @@ def handle_join_session(data):
     session_id = data.get('session_id')
     join_room(session_id)
     print(f'✅ Client joined session: {session_id}')
+    print(f'🔗 Client is now in room: {session_id}')
     emit('joined_session', {'session_id': session_id}, room=session_id)
+    print(f'📡 Sent joined_session confirmation to room: {session_id}')
 
 @socketio.on('user_audio')
 def handle_user_audio(data):
@@ -117,11 +119,18 @@ def handle_user_audio(data):
             # Send audio back to client (base64 encoded)
             audio_base64 = base64.b64encode(audio_data).decode('utf-8')
             print(f"📤 Sending {len(audio_base64)} bytes of base64 audio to client")
+            print(f"🎯 Target session_id: {session_id}")
+            print(f"🎯 Audio payload size: {len(audio_base64)} bytes")
+            print(f"🎯 Text: {ai_response[:50]}...")
+            
+            # Emit with explicit room targeting
             emit('ai_audio', {
                 'audio': audio_base64,
                 'text': ai_response
             }, room=session_id)
-            print("✅ Audio sent to client")
+            
+            print(f"✅ Audio event 'ai_audio' emitted to room: {session_id}")
+            print(f"✅ Event payload: audio={len(audio_base64)} bytes, text={len(ai_response)} chars")
         else:
             print("❌ No audio data generated - check ElevenLabs API key and credits")
     
