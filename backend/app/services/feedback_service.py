@@ -167,8 +167,8 @@ Be specific, constructive, and provide actionable feedback. Reference actual quo
             
             feedback_data = json.loads(response_text)
         except json.JSONDecodeError as e:
-            print(f"❌ JSON Parsing Error: {e}")
-            print(f"❌ Raw Response: {response_text}")
+            # print(f"❌ JSON Parsing Error: {e}")
+            # print(f"❌ Raw Response: {response_text}")
             # Attempt to clean common issues
             try:
                 # Remove trailing commas (simple regex)

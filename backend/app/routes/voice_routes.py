@@ -49,17 +49,18 @@ def handle_connect():
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    print('🔌 Client disconnected from WebSocket')
+    # print('🔌 Client disconnected from WebSocket')
+    pass
 
 @socketio.on('join_voice_session')
 def handle_join_session(data):
     """Client joins a voice session room"""
     session_id = data.get('session_id')
     join_room(session_id)
-    print(f'✅ Client joined session: {session_id}')
-    print(f'🔗 Client is now in room: {session_id}')
+    # print(f'✅ Client joined session: {session_id}')
+    # print(f'🔗 Client is now in room: {session_id}')
     emit('joined_session', {'session_id': session_id}, room=session_id)
-    print(f'📡 Sent joined_session confirmation to room: {session_id}')
+    # print(f'📡 Sent joined_session confirmation to room: {session_id}')
 
 @socketio.on('user_audio')
 def handle_user_audio(data):
@@ -67,7 +68,7 @@ def handle_user_audio(data):
     session_id = data.get('session_id')
     user_text = data.get('text')
     
-    print(f"🎤 User said: {user_text}")
+    # print(f"🎤 User said: {user_text}")
     
     if not user_text or not session_id:
         return
@@ -86,14 +87,14 @@ def handle_user_audio(data):
         persona_prompt = conversation_service.get_persona_prompt(session_id)
         chat_history = conversation_service.get_history(session_id)
         
-        print("🤖 Generating AI response...")
+        # print("🤖 Generating AI response...")
         ai_response = cohere_client.generate_response(
             user_message=user_text,
             persona_prompt=persona_prompt,
             chat_history=chat_history
         )
         
-        print(f"🤖 AI responded: {ai_response}")
+        # print(f"🤖 AI responded: {ai_response}")
         
         # Add AI response to conversation
         conversation_service.add_turn(session_id, 'ASSISTANT', ai_response)
@@ -105,12 +106,12 @@ def handle_user_audio(data):
         }, room=session_id)
         
         # Convert AI response to speech
-        print(f"🔊 Converting to speech: '{ai_response[:50]}...'")
+        # print(f"🔊 Converting to speech: '{ai_response[:50]}...'")
         try:
             audio_data = elevenlabs_client.text_to_speech(ai_response)
-            print(f"📊 Audio data size: {len(audio_data) if audio_data else 0} bytes")
+            # print(f"📊 Audio data size: {len(audio_data) if audio_data else 0} bytes")
         except Exception as tts_error:
-            print(f"❌ ElevenLabs TTS error: {tts_error}")
+            # print(f"❌ ElevenLabs TTS error: {tts_error}")
             import traceback
             traceback.print_exc()
             audio_data = b''
@@ -118,10 +119,10 @@ def handle_user_audio(data):
         if audio_data and len(audio_data) > 0:
             # Send audio back to client (base64 encoded)
             audio_base64 = base64.b64encode(audio_data).decode('utf-8')
-            print(f"📤 Sending {len(audio_base64)} bytes of base64 audio to client")
-            print(f"🎯 Target session_id: {session_id}")
-            print(f"🎯 Audio payload size: {len(audio_base64)} bytes")
-            print(f"🎯 Text: {ai_response[:50]}...")
+            # print(f"📤 Sending {len(audio_base64)} bytes of base64 audio to client")
+            # print(f"🎯 Target session_id: {session_id}")
+            # print(f"🎯 Audio payload size: {len(audio_base64)} bytes")
+            # print(f"🎯 Text: {ai_response[:50]}...")
             
             # Emit with explicit room targeting
             emit('ai_audio', {
@@ -129,13 +130,14 @@ def handle_user_audio(data):
                 'text': ai_response
             }, room=session_id)
             
-            print(f"✅ Audio event 'ai_audio' emitted to room: {session_id}")
-            print(f"✅ Event payload: audio={len(audio_base64)} bytes, text={len(ai_response)} chars")
+            # print(f"✅ Audio event 'ai_audio' emitted to room: {session_id}")
+            # print(f"✅ Event payload: audio={len(audio_base64)} bytes, text={len(ai_response)} chars")
         else:
-            print("❌ No audio data generated - check ElevenLabs API key and credits")
+            # print("❌ No audio data generated - check ElevenLabs API key and credits")
+            pass
     
     except Exception as e:
-        print(f'❌ Error handling user audio: {e}')
+        # print(f'❌ Error handling user audio: {e}')
         import traceback
         traceback.print_exc()
         emit('error', {'message': str(e)}, room=session_id)
@@ -145,8 +147,7 @@ def handle_end_session(data):
     """End the voice session"""
     session_id = data.get('session_id')
     
-    print(f"🛑 Ending session: {session_id}")
-    
+    # print(f"🛑 Ending session: {session_id}")
     # Get final transcript
     transcript = conversation_service.get_transcript(session_id)
     
@@ -157,4 +158,4 @@ def handle_end_session(data):
     emit('session_ended', {'transcript': transcript}, room=session_id)
     
     leave_room(session_id)
-    print(f'✅ Session ended: {session_id}')
+    # print(f'✅ Session ended: {session_id}')

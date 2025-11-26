@@ -71,7 +71,7 @@ def generate_feedback():
         }), 500
         
     except Exception as e:
-        print(f"❌ Error generating feedback: {e}")
+        # (f"❌ Error generating feedback: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({
@@ -102,7 +102,7 @@ def get_rubric():
             "rubric": rubric
         }), 200
     except Exception as e:
-        print(f"❌ Error fetching rubric: {e}")
+        # print(f"❌ Error fetching rubric: {e}")
         return jsonify({
             "error": "Failed to fetch rubric",
             "details": str(e)

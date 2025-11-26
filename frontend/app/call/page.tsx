@@ -57,13 +57,13 @@ function CallContent() {
 
         const initSession = async () => {
             if (socketRef.current?.connected) {
-                console.log('⚠️ Socket already connected, skipping init')
+                // console.log('⚠️ Socket already connected, skipping init')
                 return
             }
 
             try {
                 setConnectionStatus('Loading persona...')
-                console.log('🚀 Initializing session...')
+                // console.log('🚀 Initializing session...')
 
                 // Get persona from URL params or sessionStorage
                 const personaStr = searchParams?.get('persona') || sessionStorage.getItem('persona')
@@ -77,12 +77,12 @@ function CallContent() {
 
                 const parsedPersona = JSON.parse(personaStr)
                 if (mounted) setPersona(parsedPersona)
-                console.log('✅ Persona loaded:', parsedPersona)
+                // console.log('✅ Persona loaded:', parsedPersona)
 
                 // Create voice session
                 if (mounted) setConnectionStatus('Creating session...')
                 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'
-                console.log('🔗 Connecting to backend:', backendUrl)
+                // console.log('🔗 Connecting to backend:', backendUrl)
 
                 const response = await fetch(`${backendUrl}/api/start-voice-session`, {
                     method: 'POST',
@@ -97,7 +97,7 @@ function CallContent() {
                 const data = await response.json()
                 if (mounted) {
                     setSessionId(data.session_id)
-                    console.log('✅ Session created:', data.session_id)
+                    // console.log('✅ Session created:', data.session_id)
 
                     // Connect WebSocket
                     setConnectionStatus('Connecting WebSocket...')
@@ -124,7 +124,7 @@ function CallContent() {
                 currentAudioRef.current = null
             }
             if (socketRef.current) {
-                console.log('🧹 Cleaning up socket...')
+                // console.log('🧹 Cleaning up socket...')
                 socketRef.current.disconnect()
                 socketRef.current = null
             }
@@ -187,17 +187,17 @@ function CallContent() {
         try {
             if (!audioContextRef.current) {
                 audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
-                console.log('🎵 AudioContext created, state:', audioContextRef.current.state)
+                // console.log('🎵 AudioContext created, state:', audioContextRef.current.state)
             }
 
             // ✨ CRITICAL: Always resume AudioContext for HTTPS
             if (audioContextRef.current.state !== 'running') {
                 await audioContextRef.current.resume()
-                console.log('✅ AudioContext resumed, state:', audioContextRef.current.state)
+                // console.log('✅ AudioContext resumed, state:', audioContextRef.current.state)
             }
 
             setAudioContextReady(true)
-            console.log('✅ AudioContext fully initialized and ready')
+            // console.log('✅ AudioContext fully initialized and ready')
         } catch (error) {
             console.error('❌ Failed to initialize AudioContext:', error)
             setError('Failed to initialize audio. Please check browser permissions.')
@@ -207,13 +207,13 @@ function CallContent() {
     // Connect WebSocket
     const connectWebSocket = (session_id: string) => {
         if (socketRef.current?.connected) {
-            console.log('⚠️ Socket already connected, joining session...')
+            // console.log('⚠️ Socket already connected, joining session...')
             socketRef.current.emit('join_voice_session', { session_id })
             return
         }
 
         const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080'
-        console.log('🔌 Attempting WebSocket connection to:', backendUrl)
+        // console.log('🔌 Attempting WebSocket connection to:', backendUrl)
 
         const socket = io(backendUrl, {
             reconnection: true,
@@ -221,12 +221,12 @@ function CallContent() {
             reconnectionDelay: 1000,
             timeout: 20000,
             autoConnect: true,
-            // ✨ NEW: Ensure transports work with HTTPS
+            // NEW: Ensure transports work with HTTPS
             transports: ['websocket', 'polling']
         })
 
         socket.on('connect', () => {
-            console.log('✅ WebSocket connected!')
+            // console.log('✅ WebSocket connected!')
             setIsConnected(true)
             setConnectionStatus('Connected')
             setError(null)
@@ -234,15 +234,15 @@ function CallContent() {
         })
 
         socket.on('connection_response', (data) => {
-            console.log('📡 Connection response:', data)
+            // console.log('📡 Connection response:', data)
         })
 
         socket.on('joined_session', (data) => {
-            console.log('✅ Joined session:', data)
+            // console.log('✅ Joined session:', data)
         })
 
         socket.on('transcript_update', (data: { speaker: string; text: string }) => {
-            console.log('📝 Transcript update:', data)
+            // console.log('📝 Transcript update:', data)
             setMessages(prev => [...prev, {
                 speaker: data.speaker as 'user' | 'ai',
                 text: data.text,
@@ -251,8 +251,8 @@ function CallContent() {
         })
 
         socket.on('ai_audio', async (data: { audio: string; text: string }) => {
-            console.log('🔊 Received AI audio chunk, size:', data.audio?.length || 0, 'bytes')
-            console.log('📝 Audio text:', data.text)
+            // console.log('🔊 Received AI audio chunk, size:', data.audio?.length || 0, 'bytes')
+            // console.log('📝 Audio text:', data.text)
             if (!data.audio) {
                 console.error('❌ No audio data in response!')
                 return
@@ -262,13 +262,13 @@ function CallContent() {
         })
 
         socket.on('connect_error', (error) => {
-            console.error('❌ WebSocket connection error:', error)
+            // console.error('❌ WebSocket connection error:', error)
             setError(`Connection failed: ${error.message}`)
             setConnectionStatus('Connection failed')
         })
 
         socket.on('disconnect', (reason) => {
-            console.log('🔌 WebSocket disconnected:', reason)
+            // console.log('🔌 WebSocket disconnected:', reason)
             setIsConnected(false)
             setConnectionStatus('Disconnected')
 
@@ -278,7 +278,7 @@ function CallContent() {
         })
 
         socket.on('error', (error) => {
-            console.error('❌ Socket error:', error)
+            //console.error('❌ Socket error:', error)
             setError(error.message || 'Socket error occurred')
         })
 
@@ -287,7 +287,7 @@ function CallContent() {
 
     // ✨ NEW: Queue audio for sequential playback
     const queueAudio = (audioBase64: string) => {
-        console.log('📥 Adding audio to queue, queue length:', audioQueueRef.current.length + 1)
+        // console.log('📥 Adding audio to queue, queue length:', audioQueueRef.current.length + 1)
         audioQueueRef.current.push(audioBase64)
 
         // Start playing if not already playing
@@ -300,7 +300,7 @@ function CallContent() {
     const playNextInQueue = async () => {
         if (audioQueueRef.current.length === 0) {
             isPlayingRef.current = false
-            console.log('✅ Audio queue empty')
+            //console.log('✅ Audio queue empty')
             return
         }
 
@@ -321,7 +321,7 @@ function CallContent() {
     const playAudioChunk = async (audioBase64: string): Promise<void> => {
         return new Promise(async (resolve, reject) => {
             try {
-                console.log('🔊 Playing audio chunk...')
+                // console.log('🔊 Playing audio chunk...')
 
                 // Ensure AudioContext is ready
                 if (!audioContextRef.current) {
@@ -372,7 +372,7 @@ function CallContent() {
                             await audioContextRef.current.resume()
                         }
                         await audio.play()
-                        console.log('✅ Audio playing')
+                        // console.log('✅ Audio playing')
                     } catch (playError) {
                         console.error('❌ Play error:', playError)
                         clearTimeout(timeout)
@@ -384,7 +384,7 @@ function CallContent() {
 
                 audio.onended = () => {
                     clearTimeout(timeout)
-                    console.log('✅ Audio chunk finished')
+                    // console.log('✅ Audio chunk finished')
                     URL.revokeObjectURL(url)
                     currentAudioRef.current = null
                     resolve()
@@ -432,12 +432,12 @@ function CallContent() {
         recognition.onstart = () => {
             setIsListening(true)
             setIsMuted(false)
-            console.log('🎤 Voice recognition started')
+            // console.log('🎤 Voice recognition started')
         }
 
         recognition.onresult = (event: any) => {
             const transcript = event.results[event.results.length - 1][0].transcript
-            console.log('🎤 User said:', transcript)
+            // console.log('🎤 User said:', transcript)
 
             // Send to backend
             if (socketRef.current && sessionId) {
