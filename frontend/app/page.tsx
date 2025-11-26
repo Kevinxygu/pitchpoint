@@ -4,69 +4,83 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth0 } from '@auth0/auth0-react'
 import Image from 'next/image'
+import { Marquee, MarqueeContent, MarqueeFade, MarqueeItem } from '@/components/ui/shadcn-io/marquee'
+
+const marqueeLogos = [
+  { label: 'UBC BizTech', image: '/logos/ubcbiztech.jpeg' },
+  { label: 'nwPlus UBC', image: '/logos/nwplus.png' },
+  { label: 'UBC SCI', image: '/logos/ubcsci.jpeg' },
+  { label: 'UBC MA', image: '/logos/ubcma_logo.jpeg' },
+  { label: 'ACE UBC', image: '/logos/aceubc.jpeg' },
+  { label: 'UBC Sauder', image: '/logos/sauder.jpg' },
+  { label: 'HSBC', image: '/logos/HSBC.jpg' },
+  { label: 'ISSBC', image: '/logos/issbc_logo.jpeg' },
+  { label: 'BT Atheletics', image: '/logos/btathletics.png' },
+]
+
 
 export default function Home() {
-  const { isAuthenticated, isLoading, loginWithRedirect, error } = useAuth0()
-  const router = useRouter()
+    const { isAuthenticated, isLoading, loginWithRedirect, error } = useAuth0()
+    const router = useRouter()
 
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.replace('/dashboard')
+    useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            router.replace('/dashboard')
+        }
+    }, [isAuthenticated, isLoading, router])
+
+    const handleCreateAccount = () => {
+        loginWithRedirect({
+            authorizationParams: {
+                redirect_uri: `${window.location.origin}/dashboard`,
+                screen_hint: 'signup',
+            },
+        })
     }
-  }, [isAuthenticated, isLoading, router])
 
-  const handleCreateAccount = () => {
-    loginWithRedirect({
-      authorizationParams: {
-        redirect_uri: `${window.location.origin}/dashboard`,
-        screen_hint: 'signup',
-      },
-    })
-  }
+    const handleSignIn = () => {
+        loginWithRedirect({
+            authorizationParams: {
+                redirect_uri: `${window.location.origin}/dashboard`,
+            },
+        })
+    }
 
-  const handleSignIn = () => {
-    loginWithRedirect({
-      authorizationParams: {
-        redirect_uri: `${window.location.origin}/dashboard`,
-      },
-    })
-  }
+    if (isLoading) {
+        return (
+            <div className="login-shell">
+                <div className="card glass loading-card">
+                    <p className="subtle-text">Checking your session...</p>
+                </div>
+            </div>
+        )
+    }
 
-  if (isLoading) {
+    if (error) {
+        return (
+            <div className="login-shell">
+                <div className="card glass error-card">
+                    <div className="error-badge">Auth error</div>
+                    <p className="error-text">{error.message}</p>
+                </div>
+            </div>
+        )
+    }
+
     return (
-      <div className="login-shell">
-        <div className="card glass loading-card">
-          <p className="subtle-text">Checking your session...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="login-shell">
-        <div className="card glass error-card">
-          <div className="error-badge">Auth error</div>
-          <p className="error-text">{error.message}</p>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="landing-page">
-      {/* Navigation Bar */}
-      <nav className="landing-nav">
-        <div className="landing-nav-content">
-          <div className="landing-logo">
-            <Image
-              src="/images/white-logo.png"
-              alt="PitchPoint Logo"
-              width={150}
-              height={40}
-              priority
-            />
-          </div>
+        <div className="landing-page">
+            {/* Navigation Bar */}
+            <nav className="landing-nav">
+                <div className="landing-nav-content">
+                    <div className="landing-logo">
+                        <Image
+                            src="/images/white-logo.png"
+                            alt="PitchPoint Logo"
+                            width={150}
+                            height={40}
+                            priority
+                        />
+                    </div>
 
           <div className="landing-nav-links">
             {/* <a href="#pricing" className="landing-nav-link">Pricing</a>
@@ -130,6 +144,41 @@ export default function Home() {
           </p>
         </div>
       </main>
+
+      {/* Logo Marquee */}
+      <section className="landing-section py-10">
+        <div className="space-y-14">
+          <p className="text-center text-2xl tracking-wide text-white/100">
+            Join our future businesses and families
+          </p>
+          <div className="relative w-screen -mx-[50vw] left-1/2 right-1/2">
+            <Marquee>
+              <MarqueeFade side="left" />
+              <MarqueeFade side="right" />
+              <MarqueeContent speed={100} gradient={false}>
+                {marqueeLogos.map((item) => (
+                  <MarqueeItem className="flex flex-col items-center gap-2 h-32 w-32 sm:h-36 sm:w-36" key={item.label}>
+                    <div
+                      className="relative h-24 w-24 sm:h-28 sm:w-28 rounded-full overflow-hidden border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.35)] bg-white/5"
+                    >
+                      <Image
+                        src={item.image}
+                        alt={item.label}
+                        fill
+                        sizes="112px"
+                        className="object-cover"
+                      />
+                    </div>
+                    <span className="text-sm sm:text-base text-white/80">
+                      {item.label}
+                    </span>
+                  </MarqueeItem>
+                ))}
+              </MarqueeContent>
+            </Marquee>
+          </div>
+        </div>
+      </section>
 
       {/* Core Functionality Section */}
       <section className="landing-section mt-24">
