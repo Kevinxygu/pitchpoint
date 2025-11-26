@@ -182,6 +182,13 @@ function FeedbackContent() {
                         Practice Again
                     </button>
                     <button
+                        onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLSd2vW3Ml_h1FS5dtoVTsh6KGM8Pa2ECmWkMh78GXYj-6XOQVw/viewform?usp=header', '_blank')}
+                        className="px-6 py-3 bg-[#FFFFFF] border-2 border-[#FFFFFF] text-[#0F001E] rounded-lg hover:bg-[#DE0037] hover:border-[#DE0037] hover:text-[#FFFFFF] transition font-medium"
+                    >
+                        Give Us Feedback
+                    </button>
+
+                    <button
                         onClick={() => window.print()}
                         className="px-6 py-3 bg-[#DE0037] text-[#FFFFFF] rounded-lg hover:bg-[#DE0037]/90 transition font-medium"
                     >
