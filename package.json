@@ -1,6 +1,6 @@
 {
   "dependencies": {
     "docker": "^1.0.0",
-    "next": "link:@vercel/analytics/next"
+    "next": "14.2.16"
   }
 }
