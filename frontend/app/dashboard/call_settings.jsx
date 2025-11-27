@@ -7,22 +7,31 @@ const personalityOptions = [
   { value: 'enthusiastic', label: 'Enthusiastic Hype' },
   { value: 'analytical', label: 'Analytical Strategist' },
   { value: 'concise', label: 'Concise Closer' },
-  { value: 'friendly', label: 'Friendly Partner' },
+  { value: 'nice', label: 'Nice' },
+  { value: 'angry', label: 'Angry' },
+  { value: 'skeptical', label: 'Skeptical' },
+  { value: 'confused', label: 'Confused' },
+  { value: 'random', label: 'Random' },
+  { value: 'distracted', label: 'Distracted' },
+  { value: 'indecisive', label: 'Indecisive' },
 ]
 
 export default function CallSettings() {
   const [company, setCompany] = useState('')
   const [personality, setPersonality] = useState(personalityOptions[0].value)
+  const [role, setRole] = useState('')
+  const [objective, setObjective] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
 
-  const buildPersonaFromProfile = (companyName, profile, personalityValue) => {
+  const buildPersonaFromProfile = (companyName, profile, personalityValue, roleValue, objectiveValue) => {
     const primaryContact = profile?.key_personnel?.[0] || {}
 
     return {
       name: primaryContact.name || companyName,
-      role: primaryContact.title || 'Decision Maker',
+      role: roleValue || primaryContact.title || 'Decision Maker',
+      objective: objectiveValue || 'Drive the conversation forward',
       company: profile?.entity_name || companyName,
       difficulty: 'medium',
       background: profile?.overview || '',
@@ -57,7 +66,13 @@ export default function CallSettings() {
       setError('')
 
       const companyData = await get_company_info(company)
-      const personaPayload = buildPersonaFromProfile(company, companyData?.profile, personality)
+      const personaPayload = buildPersonaFromProfile(
+        company,
+        companyData?.profile,
+        personality,
+        role,
+        objective
+      )
       const personaString = JSON.stringify(personaPayload)
 
       sessionStorage.setItem('persona', personaString)
@@ -105,6 +120,28 @@ export default function CallSettings() {
                 </option>
               ))}
             </select>
+          </label>
+
+          <label className="input-block">
+            <span className="input-label">Role</span>
+            <input
+              type="text"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              placeholder="e.g., Account Executive"
+              className="input"
+            />
+          </label>
+
+          <label className="input-block">
+            <span className="input-label">Call objective</span>
+            <textarea
+              value={objective}
+              onChange={(e) => setObjective(e.target.value)}
+              placeholder="e.g., Secure a follow-up meeting to discuss tailored solutions"
+              className="input"
+              rows={3}
+            />
           </label>
 
           {error && <p className="input-error">{error}</p>}
